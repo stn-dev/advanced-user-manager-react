@@ -1,0 +1,41 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+html,
+body {
+  overflow-x: hidden;
+}
+
+.btn {
+  width: fit-content;
+  height: fit-content;
+  padding: 16px 32px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  color: white;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  margin: 2px;
+}
+
+.btn:hover {
+  cursor: pointer;
+}
+
+.edit {
+  background-color: rgb(118, 118, 248);
+}
+.edit:hover {
+  background-color: rgb(100, 100, 215);
+}
+
+.delete {
+  background-color: rgb(226, 100, 100);
+}
+.delete:hover {
+  background-color: rgb(195, 82, 82);
+}
