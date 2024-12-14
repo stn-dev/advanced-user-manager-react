@@ -3,13 +3,19 @@ import Input from '../input/Input'
 import Button from '../button/Button'
 import { useEffect, useState } from 'react'
 
-type Props = {}
 
 type UserType = {
     id: string
     name: string,
     age: string,
-    gender: string
+    gender: string,
+    editing: boolean
+}
+
+type EditType = {
+    id: string,
+    editable: boolean,
+    toEdit: boolean
 }
 
 export const Tables = () => {
@@ -18,23 +24,56 @@ export const Tables = () => {
     const [duplicateUser, setDuplicateUser] = useState<Array<UserType>>([])
     const [filter, setFilter] = useState('')
     const [filterLength, setFilterLength] = useState<number | string>()
-    const [editable, setEditable] = useState(false)
-    const [editId, setEditId] = useState<string | null>(null)
+    // const [editable, setEditable] = useState(false)
+    // const [editId, setEditId] = useState<string | null>(null)
+    // const [edit, setEdit] = useState<EditType>({ id: '', editable: false, toEdit: false })
+    // const [data, setData] = useState<UserType>({})
+    const tableBody = document.querySelector('.table-body')
 
-    // useEffect(() => {
+    const editUser = (pers: UserType, id: string) => {
 
-    //     if (!editId) return
+        const el = document.querySelectorAll(`#${pers.name}-${id}`)
 
-    //     let selectedItems = document.querySelectorAll(`#td${editId}`)
+        const persone = user.find((user) => user === pers)
 
-    //     console.log(selectedItems[0])
-    //     // selectedItems.
+        if (persone?.editing == false) {
 
-    // }, [editId])
+            for (let i = 0; i <= 2; i++) {
+                el[i].setAttribute("contenteditable", "true")
+            }
+
+            const toogleEdit = user.map((pers) => pers.id === id ? { ...pers, editing: true } : pers)
+
+            setUser(toogleEdit)
+            setDuplicateUser(toogleEdit)
+        } else {
+
+            for (let i = 0; i <= 2; i++) {
+                el[i].removeAttribute('contenteditable')
+            }
+
+            const toogleEdit = user.map((pers) => pers.id === id ? { ...pers, editing: false } : pers)
+
+            setUser(toogleEdit)
+            setDuplicateUser(toogleEdit)
+        }
+
+    }
+
+    const updateContent = (id: string, updatedContent: object) => {
+
+        const updated = user.map((pers) => pers.id === id ? { ...pers, ...updatedContent } : pers)
+
+        setUser(updated)
+        setDuplicateUser(updated)
+
+        console.log(user)
+    }
 
     const deleteUser = (id: string) => {
         setUser(user.filter((el) => el.id !== id))
     }
+
 
     const changeFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFilter(e.target.value as string)
@@ -63,7 +102,7 @@ export const Tables = () => {
 
         const data = {
             id: Date.now().toString(),
-            name, gender, age
+            name, gender, age, editing: false
         }
 
         setUser([...user, data])
@@ -72,6 +111,7 @@ export const Tables = () => {
 
         console.log(duplicateUser)
         e.currentTarget.reset()
+        console.log(tableBody?.childNodes)
     }
 
     useEffect(() => {
@@ -130,39 +170,38 @@ export const Tables = () => {
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody
+                        className='table-body'
+                        onBlur={() => console.log("first")}
+                    >
                         {
                             user.map((pers) => (
                                 <tr
                                     key={pers.id}
                                 >
                                     <td
-                                        autoFocus
-                                        contentEditable={editId == pers.id}
-                                        style={{ border: `${editId == pers.id ? "2px solid black" : "1px solid blue"}` }}
+                                        onBlur={(e) => updateContent(pers.id, { name: e.target.innerHTML })}
+                                        id={`${pers.name}-${pers.id}`}
                                     >
                                         {pers.name}
                                     </td>
                                     <td
-                                        contentEditable={editId == pers.id}
-                                        style={{ border: `${editId == pers.id ? "2px solid black" : "1px solid blue"}` }}
+                                        onBlur={(e) => updateContent(pers.id, { gender: e.target.innerHTML })}
+                                        id={`${pers.name}-${pers.id}`}
                                     >
                                         {pers.gender}
                                     </td>
                                     <td
-                                        contentEditable={editId == pers.id}
-                                        style={{ border: `${editId == pers.id ? "2px solid black" : "1px solid blue"}` }}
+                                        onBlur={(e) => updateContent(pers.id, { age: e.target.innerHTML })}
+                                        id={`${pers.name}-${pers.id}`}
                                     >
                                         {pers.age}
                                     </td>
                                     <td>
                                         <Button
-                                            content={'Edit'}
+                                            content={pers.editing ? "save" : 'Edit'}
                                             styleClass='edit'
-                                            onClick={() => {
-                                                setEditId(pers.id)
-                                                setEditable(!editable)
-                                            }}
+                                            onClick={() => editUser(pers, pers.id)}
                                         />
                                         <Button
                                             content='Delete'
