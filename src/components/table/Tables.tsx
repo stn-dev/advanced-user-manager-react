@@ -2,6 +2,7 @@ import style from './table.module.css'
 import Input from '../input/Input'
 import Button from '../button/Button'
 import { useEffect, useState } from 'react'
+import { setCommentRange } from 'typescript'
 
 
 type UserType = {
@@ -21,14 +22,17 @@ type EditType = {
 export const Tables = () => {
 
     const [user, setUser] = useState<Array<UserType>>([])
-    const [duplicateUser, setDuplicateUser] = useState<Array<UserType>>([])
+
     const [filter, setFilter] = useState('')
     const [filterLength, setFilterLength] = useState<number | string>()
-    // const [editable, setEditable] = useState(false)
-    // const [editId, setEditId] = useState<string | null>(null)
-    // const [edit, setEdit] = useState<EditType>({ id: '', editable: false, toEdit: false })
-    // const [data, setData] = useState<UserType>({})
-    const tableBody = document.querySelector('.table-body')
+    const [currentPage, setScurrentPage] = useState(1)
+
+    const itemPerPage = 5;
+    const lastItem = currentPage * itemPerPage;
+    const indexOfFirstItem = lastItem - itemPerPage;
+    const filtered = user.filter((user) => user.name.includes(filter))
+    const dataFilter = filtered.slice(indexOfFirstItem, lastItem)
+    const [duplicateUser, setDuplicateUser] = useState<Array<UserType>>(user.slice(indexOfFirstItem, lastItem))
 
     const editUser = (pers: UserType, id: string) => {
 
@@ -71,23 +75,21 @@ export const Tables = () => {
     }
 
     const deleteUser = (id: string) => {
+
         setUser(user.filter((el) => el.id !== id))
+
+        if (currentPage < 1) setScurrentPage(1)
+
+        if (duplicateUser.length === 1) {
+            setScurrentPage((per) => per - 1)
+        }
+
     }
 
 
     const changeFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFilter(e.target.value as string)
         console.log(filter)
-    }
-
-    const filterUser = () => {
-        if (filter !== "") {
-            setUser(user.filter((el) => el.name.includes(filter)))
-            setFilterLength(user.filter((el) => el.name.includes(filter)).length)
-        } else {
-            setUser(duplicateUser)
-            setFilterLength('no search')
-        }
     }
 
 
@@ -107,16 +109,8 @@ export const Tables = () => {
 
         setUser([...user, data])
 
-        setDuplicateUser([...duplicateUser, data])
-
-        console.log(duplicateUser)
-        e.currentTarget.reset()
-        console.log(tableBody?.childNodes)
     }
 
-    useEffect(() => {
-        filterUser()
-    }, [filter])
 
 
 
@@ -175,7 +169,7 @@ export const Tables = () => {
                         onBlur={() => console.log("first")}
                     >
                         {
-                            user.map((pers) => (
+                            dataFilter.map((pers) => (
                                 <tr
                                     key={pers.id}
                                 >
@@ -216,16 +210,20 @@ export const Tables = () => {
 
                 </table>
             </div>
-
-            {/* <Input
-                type='text'
-                name='test'
-                placeholder='enter your name ...'
-            />
-            <Button
-                content='edit'
-                styleClass='delete'
-            /> */}
+            <div className={style.pagination} >
+                {
+                    Array.from({ length: Math.ceil(filtered.length / itemPerPage) }, (_, index) => (
+                        <button
+                            className={style.paginationBtn}
+                            onClick={() => { setScurrentPage(index + 1) }}
+                            style={{ backgroundColor: `${currentPage === index + 1 ? 'rgb(183 183 255)' : 'rgb(232, 232, 255)'}` }}
+                            key={index}
+                        >
+                            {index + 1}
+                        </button>
+                    ))
+                }
+            </div>
         </div>
     )
 }
