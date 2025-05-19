@@ -40,8 +40,8 @@ Chaque utilisateur est représenté sous la forme :
   "gender": "Female",
   "age": 28
 }
+```
 
----
 🧪 But du projet
 Ce projet est un exercice de logique destiné à :
 
@@ -53,7 +53,5 @@ Mettre en place un système de pagination filtrable
 
 Comprendre l’état React et sa gestion sans backend
 
-
 🧑‍🎨 Auteur
 Développé avec ❤️ par @stn-dev
-```
